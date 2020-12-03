@@ -9,7 +9,7 @@ def treeCountAt(arr,i)
 end
 
 def sumTrees(arr,right,down,row=0,col=0)
-  return 0 if(row >= arr.length )
+  return 0 if(row >= arr.length)
   treeCountAt(arr[row],col) + sumTrees(arr,right,down,row+down,col+right)
 end
 
