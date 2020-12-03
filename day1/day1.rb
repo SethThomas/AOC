@@ -5,9 +5,6 @@ def pairSumTo(arr1, num)
   arr1 & arr2
 end
 
-
-
-
 data = File.readlines('input1.txt').collect! &:to_i
 
 # part 1
