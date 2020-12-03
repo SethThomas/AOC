@@ -5,7 +5,7 @@ def isTree?(x)
 end
 
 def treeCountAt(arr,i)
-  isTree?(arr[ i % (arr.length-1) ]) ? 1 : 0
+  isTree?( arr[i % (arr.length-1)] ) ? 1 : 0
 end
 
 def sumTrees(arr,right,down,row=0,col=0)
