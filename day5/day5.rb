@@ -1,8 +1,8 @@
 # https://adventofcode.com/2020/day/5
 
 class BoardingPass
-  def initialize(boardingPass, decodeStrategy)
-    @boardingPass = decodeStrategy.decode(boardingPass)
+  def initialize(pass, decodeStrategy)
+    @boardingPass = decodeStrategy.decode(pass)
     @decode = decodeStrategy
   end
 
@@ -44,14 +44,13 @@ module SeatingStrategies
   end
 end
 
-seatIds = File.readlines('input1.txt').map do |bpCode|
-  BoardingPass.new(bpCode, SeatingStrategies::BinarySpace).seat
-end
+seats = File.readlines('input1.txt').map { |pass|
+  BoardingPass.new(pass, SeatingStrategies::BinarySpace).seat
+}.sort!
 
-seatIds.sort!
-puts "Part 1: max seat ID is #{seatIds.last}"
-
-missingSeat = seatIds.each_cons(2) do |seat1, seat2|
+missingSeat = seats.each_cons(2) do |seat1, seat2|
   break seat2 - 1 if ( seat2 - seat1 == 2 )
 end
+
+puts "Part 1: max seat ID is #{seats.last}"
 puts "Part 2: your seat number is #{missingSeat}"
