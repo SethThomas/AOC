@@ -23,11 +23,10 @@ module SeatingStrategies
 
   # part 1 algorithm
   class BinarySpace
-    @@conversions = {'B' => '1', 'F' => '0', 'R' => '1', 'L' => '0'}
 
     # BFFFBBFRRR => 1000110111
     def self.decode(code)
-      code.gsub(Regexp.union(@@conversions.keys), @@conversions)
+      code.tr("FL","0").tr("BR","1")
     end
 
     def self.row(code)
