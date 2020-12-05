@@ -20,7 +20,7 @@ class BoardingPass
 end
 
 module SeatingStrategies
-  
+
   # part 1 algorithm
   class BinarySpace
     @@conversions = {'B' => '1', 'F' => '0', 'R' => '1', 'L' => '0'}
@@ -45,9 +45,8 @@ module SeatingStrategies
   end
 end
 
-seatIds = []
-File.readlines('input1.txt').each do |bpCode|
-  seatIds << BoardingPass.new(bpCode, SeatingStrategies::BinarySpace).seat
+seatIds = File.readlines('input1.txt').map do |bpCode|
+  BoardingPass.new(bpCode, SeatingStrategies::BinarySpace).seat
 end
 
 seatIds.sort!
