@@ -57,5 +57,6 @@ ops_list.map do |ops|
   c.execute!
   if c.completed?
     puts "Accumulator is #{c.acc}"
+    break
   end
 end
