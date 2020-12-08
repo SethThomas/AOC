@@ -39,7 +39,7 @@ c.execute!
 puts "Accumulator is #{c.acc}"
 
 #part 2
-ops_list, tmp = [],[]
+ops_list = []
 # build all jmp/nop permutations of the program
 operations.each_with_index do |oper,i|
   op,num = oper
