@@ -18,7 +18,7 @@ class Scanner
     return data[curr_index + window_size]
   end
 
-  # returns sub array of @data that sums to `target`
+  # returns sub array of @data that sums to `target`, nil if none exists
   def scan2(target)
     group_size = 2
     while group_size < data.length + 1
