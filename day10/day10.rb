@@ -2,10 +2,9 @@
 
 adapters = File.readlines('input.txt').collect(&:to_i).sort
 
-
 # PART 1
-my_device = adapters.last + 3
 outlet = 0
+my_device = adapters.last + 3
 diff_arr = [outlet, *adapters, my_device].each_cons(2).map{ |a,b| b-a }
 puts "Part 1 answer is #{diff_arr.count(1) * diff_arr.count(3)}"
 
