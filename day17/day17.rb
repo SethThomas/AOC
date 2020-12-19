@@ -1,59 +1,57 @@
 # https://adventofcode.com/2020/day/17
-require "matrix"
+require "set"
 
 class PocketDimension
 
-  attr_reader :space, :neighbor_coords
-
   def initialize(initial_state, dimensions=3)
-    @space = Hash.new { |h, k| h[k] = "." }
+    @dimensions = dimensions
+    @actives = Set.new
     initial_state.each_with_index do |row, x_index|
       row.split("").each_with_index do |cube, y_index|
-        coordinates = Vector.elements([x_index,y_index] + Array.new(dimensions-2){0})
-        @space[coordinates] = cube
+        coordinates = [x_index,y_index] + Array.new(dimensions-2){0}
+        @actives.add(coordinates) if cube =="#"
       end
     end
-    @neighbor_coords = neighbor_coordinates(dimensions)
   end
 
   def cycle!
-    new_state = {}
-    cubes_to_inspect = @space.keys.map{|cube| neighbor_points_of(cube)}.flatten.uniq
-    cubes_to_inspect.each do |cube|
-      num_active_neighbors = neighbors_of(cube).count("#")
-      if @space[cube] == "#" && !num_active_neighbors.between?(2,3)
-        new_state[cube] = "."
-      elsif @space[cube] == "." && num_active_neighbors == 3
-        new_state[cube] = "#"
+    new_state = Set.new
+    neighbors = @actives.map { |active_cube| neighbors_of(active_cube) }
+    neighbors.flatten(1).uniq.each do |neighbor|
+      num_active = num_active_neighbors(neighbor)
+      if isActive?(neighbor)
+        if num_active.between?(2,3)
+          new_state.add(neighbor)
+        end
+      elsif num_active == 3
+          new_state.add(neighbor)
       end
     end
-    @space.merge! new_state
+    @actives = new_state
+  end
+
+  def num_active_neighbors(cube)
+    Set.new(neighbors_of(cube)).intersection(@actives).count
+  end
+
+  def isActive?(cube)
+    @actives.include?(cube)
   end
 
   def neighbors_of(cube)
-    @neighbor_coords.map do |coord|
-      @space[coord + cube]
-    end
+    neighbor_coordinates.map { |coord| coord.zip(cube).map{|a,b| a + b} }
   end
 
-  def neighbor_points_of(cube)
-    @neighbor_coords.map do |coord|
-      coord + cube
+  def neighbor_coordinates
+    @neighbor_coords ||= begin
+      [-1,0,1].repeated_permutation(@dimensions).to_a - [Array.new(@dimensions){0}]
     end
-  end
-
-  def neighbor_coordinates(dimensions)
-    # get all neighbor coordinates
-    neighbor_coords = [-1,0,1].repeated_permutation(dimensions).to_a
-    center_coord = [Array.new(dimensions){0}]
-    permutations = (neighbor_coords - center_coord).map{|point| Vector.elements(point)}
   end
 
   def num_active_cubes
-    @space.values.count("#")
+    @actives.size
   end
 end
-
 
 data = File.read("input.txt").split("\n")
 #Part 1
@@ -61,7 +59,6 @@ pd = PocketDimension.new(data)
 6.times { |i| pd.cycle! }
 puts "Part 1 answer: #{pd.num_active_cubes}"
 
-# Part 2
 pd = PocketDimension.new(data,4)
 6.times { |i| pd.cycle! }
 puts "Part 2 answer: #{pd.num_active_cubes}"
