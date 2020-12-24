@@ -51,14 +51,14 @@ class HexagonalFloor
     end
 
     @tiles -= to_white
-    @tiles += to_black unless to_black.empty?
+    @tiles += to_black
   end
 
 end
 
 
 floor = HexagonalFloor.new
-File.read('input.txt').split("\n").each do |line|
+File.read('input_lg.txt').split("\n").each do |line|
   floor.add_tile(line.scan(/e|w|se|sw|nw|ne/))
 end
 
