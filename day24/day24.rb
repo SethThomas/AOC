@@ -31,7 +31,7 @@ class HexagonalFloor
     !is_black?(tile)
   end
 
-  def black_neighbors_of(tile)
+  def black_neighbors(tile)
     @neighbors_cache[tile].clone.keep_if{ |neighbor| is_black?(neighbor)}
   end
 
@@ -41,26 +41,24 @@ class HexagonalFloor
 
   def flip_all
     to_white,to_black = Set.new,Set.new
-    tiles_to_consider = @tiles.clone
-    tiles_to_consider.merge(@tiles.map{|t| @neighbors_cache[t] }.flatten(1))
+    tiles_to_consider = Set.new(@tiles.map{|t| @neighbors_cache[t] }.flatten(1))
+    tiles_to_consider.merge(@tiles)
 
     tiles_to_consider.each do |tile|
-      num_bn = black_neighbors_of(tile).length
-      if is_white?(tile) && num_bn == 2
-        to_black.add(tile)
-      elsif is_black?(tile) && !num_bn.between?(1,2)
-        to_white.add(tile)
-      end
+      num_bn = black_neighbors(tile).length
+      to_black.add(tile) if is_white?(tile) && num_bn == 2
+      to_white.add(tile) if is_black?(tile) && !num_bn.between?(1,2)
     end
-    @tiles.subtract(to_white)
-    @tiles.merge(to_black) unless to_black.empty?
+
+    @tiles -= to_white
+    @tiles += to_black unless to_black.empty?
   end
 
 end
 
 
 floor = HexagonalFloor.new
-File.read('input_lg.txt').split("\n").each do |line|
+File.read('input.txt').split("\n").each do |line|
   floor.add_tile(line.scan(/e|w|se|sw|nw|ne/))
 end
 
@@ -68,9 +66,5 @@ end
 puts "There are #{floor.tiles.size} black floor tiles"
 
 # Part 2
-100.times do |day|
-  floor.flip_all
-  puts "Day #{day+1}: #{floor.tiles.size}"
-end
-
+100.times { |day| floor.flip_all; puts "Day #{day+1}: #{floor.tiles.size}"}
 puts "Part 2: #{floor.tiles.size}"
