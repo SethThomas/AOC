@@ -53,7 +53,11 @@ class CircleOfCups
 
   # insert cups clockwise starting from dest_cup
   def place(dest_cup,cups)
-    @cups.merge!([dest_cup,cups,@cups[dest_cup]].flatten.each_cons(2).to_h)
+    tmp = @cups[dest_cup]
+    @cups[dest_cup] = cups[0]
+    @cups[cups[0]] = cups[1]
+    @cups[cups[1]] = cups[2]
+    @cups[cups[2]] = tmp
   end
 
   def next_curr_cup
@@ -89,6 +93,10 @@ class CircleOfCups
     @cups[cup]
   end
 
+  def size
+    @cups.length
+  end
+
 end
 
 # Part 1
@@ -98,7 +106,7 @@ game = GameOfCups.new(data)
 game.play(100)
 puts "Part 1: #{game.circle}"
 
-# Part 2
+#Part 2
 highest_number = data.sort.last+1
 (highest_number..1_000_000).each {|num| data << num }
 game = GameOfCups.new(data)
