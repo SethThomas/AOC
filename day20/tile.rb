@@ -1,28 +1,23 @@
 require 'set'
+
 class Tile
 
   attr_reader :data, :id
 
   NUM_EDGES = 4
-  DIRS = {:N=>0,:E=>1,:S=>2,:W=>3}.freeze
-  STATES = [%i(a b c d e d g b),
-            %i(h a f c d c b a),
-            %i(g h e f c f a h),
-            %i(b g d e f e h g)].freeze
+  SIDES = {:N=>0,:E=>1,:S=>2,:W=>3}.freeze
+  EDGE_LABELS =  %i(a b c d e f g h).freeze
+  EDGE_STATES = [%i(a b c d e d g b),
+                 %i(h a f c d c b a),
+                 %i(g h e f c f a h),
+                 %i(b g d e f e h g)].freeze
 
   def initialize(args)
     @id = args[:id]
     @data = args[:data].map{ |a| a.split("") }
-    @edge_hash = %i(a b c d e f g h).zip(all_edges).to_h
-    # these variables track the state of the 2D data array
-    @flipped, @num_rotations = false, 0
-    # these variables track the current tile orientation
-    @flip_offset,@rotation_offset = false,0
-  end
-
-  # returns array of edges
-  def edges
-    STATES[@rotation].map{|sym| @edge_hash[sym] }
+    @edge_hash = EDGE_LABELS.zip(all_edges).to_h
+    @tile_flipped,@tile_rotations = false,0
+    @edge_flipped,@edge_rotations = false,0
   end
 
   # returns Set of all possible edge orientations
@@ -36,20 +31,20 @@ class Tile
 
   # rotate edges 90 degrees clockwise
   def rotate!
-    @num_rotations = (@num_rotations+1) % NUM_EDGES
-    @rotation_offset = (@rotation_offset+1) % NUM_EDGES
+    @tile_rotations = (@tile_rotations+1) % NUM_EDGES
+    @edge_rotations = (@edge_rotations+1) % NUM_EDGES
   end
 
   # flip edges on the Y axis
   def flip!
-    @flipped = !@flipped
-    @flip_offset = !@flip_offset
+    @tile_flipped = !@tile_flipped
+    @edge_flipped = !@edge_flipped
   end
 
   # returns the edge at the specified direction (N S E W)
   def edge_at(dir)
-    dir_index = @flip_offset ? DIRS[dir] + NUM_EDGES : DIRS[dir]
-    @edge_hash[STATES[@rotation_offset][dir_index]]
+    side_offset = @edge_flipped ? SIDES[dir] + NUM_EDGES : SIDES[dir]
+    @edge_hash[EDGE_STATES[@edge_rotations][side_offset]]
   end
 
   # returns true of self is a neighbor of tile, false otherwise
@@ -59,17 +54,17 @@ class Tile
 
   # returns shared edges between two tiles
   def shared_edges(tile)
-    (all_edges & tile.all_edges)
+    all_edges & tile.all_edges
   end
 
-  # orient self with edge[direction] == edge
-  # returns true if orientation is possible, false otherwise
-  def fits?(dir,edge)
+  # returns true if this tile has the given edge
+  def has_edge?(edge)
     return all_edges.include?(edge)
   end
 
+  # orient self with edge[direction] == edge
   def arrange!(dir,edge)
-    return false unless fits?(dir,edge)
+    return false unless has_edge?(edge)
     8.times do |i|
       return true if edge_at(dir) == edge
       i == NUM_EDGES-1 ? flip! : rotate!
@@ -77,7 +72,7 @@ class Tile
   end
 
   # return a copy of tile data with borders removed
-  def strip
+  def remove_borders
     refresh!
     data = @data.clone
     # remove the first and last rows
@@ -95,9 +90,9 @@ class Tile
 
   # keeps 2D data grid consistent with edge rotations and flips
   def refresh!
-    @num_rotations.times { @data = @data.transpose.map(&:reverse) }
-    @data.map{|d| d.reverse! } if @flipped
-    @num_rotations,@flipped = 0, false
+    @tile_rotations.times { @data = @data.transpose.map(&:reverse) }
+    @data.map{|d| d.reverse! } if @tile_flipped
+    @tile_rotations,@tile_flipped = 0, false
   end
 
   def to_s

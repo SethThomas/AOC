@@ -12,7 +12,7 @@ class Puzzle
 
   def solve
     # Step 1: pick any corner
-    corner = corners.last
+    corner = corners.first
     # Step 2: rotate corner into position
     se1,se2 = neighbors[corner].map{|n|corner.shared_edges(n)}
     8.times do |i|
@@ -34,12 +34,12 @@ class Puzzle
     return if row >= @dimension || col >= @dimension
     neighbors[parent].each do |t|
       unless @seen.include?(t)
-        if t.fits?(:W, parent.edge_at(:E))
+        if t.has_edge?(parent.edge_at(:E))
           t.arrange!(:W, parent.edge_at(:E))
           @seen.add(t)
           @board[row][col+1] = t
           solver({row:row,col:col+1,tile: t})
-        elsif t.fits?(:N, parent.edge_at(:S))
+        elsif t.has_edge?(parent.edge_at(:S))
           t.arrange!(:N, parent.edge_at(:S))
           @seen.add(t)
           @board[row+1][col] = t
@@ -66,9 +66,9 @@ class Puzzle
 
   # combine a board of tiles into a single Tile
   def as_tile
-    data = @board.map do |row|
+    data = @board.map do |row_of_tiles|
       # strip the borders from each tile in the row
-      row.map{ |tile| tile.strip }
+      row_of_tiles.map{ |tile| tile.remove_borders }
     end.map{|d| d.transpose }.flatten(1).map{|d| d.join}
     Tile.new(:id=>1234,:data=>data)
   end

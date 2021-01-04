@@ -7,12 +7,6 @@ RSpec.describe Tile do
     @tile = Tile.new(:id=>1,:data=> data )
   end
 
-  describe "#edges" do
-    it "returns an array of edges for both tile sides" do
-      expect(@tile.edges).to eql(%w(12 25 45 14 21 14 54 25))
-    end
-  end
-
   describe "#edge_at", :focus=>true do
     it "returns the edge at a given position" do
       expect(@tile.edge_at(:N)).to eql ("12")
@@ -71,8 +65,7 @@ RSpec.describe Tile do
     end
     it "maintains the same orientation between calls" do
       @tile.flip!; @tile.rotate! ; @tile.rotate!;
-      expect { @tile.refresh! }.to_not change {@tile.to_s}.
-      from([["1", "2"], ["4", "5"]]).to([["4", "5"], ["1", "2"]])
+      expect { @tile.refresh! }.to_not change{@tile.to_s}
     end
   end
 
@@ -128,12 +121,12 @@ RSpec.describe Tile do
     end
   end
 
-  describe "#fits?" do
+  describe "#has_edge?" do
     it "returns true if the requested orientation is possible" do
-      expect(@tile.fits?(:W,"25")).to be(true)
+      expect(@tile.has_edge?("25")).to be(true)
     end
     it "returns false if the requested orientation is not" do
-      expect(@tile.fits?(:W,"XX")).to be(false)
+      expect(@tile.has_edge?("XX")).to be(false)
     end
   end
 
@@ -149,7 +142,7 @@ RSpec.describe Tile do
     end
   end
 
-  describe "#strip" do
+  describe "#remove_borders" do
     before do
       data = ["****",
               "*..*",
@@ -158,7 +151,7 @@ RSpec.describe Tile do
       @tile = Tile.new(:id=>1,:data=> data )
     end
     it "returns a borderless tile" do
-      expect(@tile.strip).to eql(["..",".."])
+      expect(@tile.remove_borders).to eql(["..",".."])
     end
   end
 
