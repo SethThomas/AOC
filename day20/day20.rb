@@ -19,5 +19,5 @@ monster = ["..................#.",
            "#....##....##....###",
            ".#..#..#..#..#..#..."]
 scanner = ImageScanner.new(:image=>monster)
-num_monsters = scanner.num_images(board).max
+num_monsters = scanner.num_images(board)
 puts "Part 2: #{num_monsters} monsters, #{board.count("#") - num_monsters*15} roughness"

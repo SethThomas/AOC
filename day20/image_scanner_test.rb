@@ -9,8 +9,8 @@ RSpec.describe ImageScanner do
     tile_data = ["......",
                  ".##...",
                  "..#...",
+                 "..#....",
                  "......",
-                 "#...##",
                  "##...#"]
     @tile = Tile.new(:id=>1,:data=> tile_data )
   end
@@ -23,17 +23,13 @@ RSpec.describe ImageScanner do
 
   describe "#scan" do
     it "returns the number of images in a tiles current orientation" do
-      expect(@scaner.scan(@tile)).to eql(2)
+      expect(@scaner.scan(@tile)).to eql(1)
     end
   end
 
   describe "#num_images" do
     it "returns the number of images in all 8 tile orientations" do
-      results = @scaner.num_images(@tile)
-      # results of all 8 orientations
-      expect(results.count(2)).to be(2)
-      expect(results.count(1)).to be(2)
-      expect(results.count(0)).to be(4)
+      expect(@scaner.num_images(@tile)).to eql(1)
     end
   end
 

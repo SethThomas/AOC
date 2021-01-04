@@ -6,8 +6,8 @@ class ImageScanner
   def initialize(args)
     @image = args[:image]
     @char  = args[:char] || "#"
-    @max_y = img_coords.map(&:last).max
-    @max_x = img_coords.map(&:first).max
+    @max_y = @image.first.length
+    @max_x = @image.length
   end
 
   # returns array of x,y coordinates
@@ -21,19 +21,28 @@ class ImageScanner
 
   # returns an array containing number of images in all 8 tile orientations
   def num_images(tile)
+    num_images = 0
     8.times.map do |i|
-      i == 4 ? tile.flip! : tile.rotate!
+      num_images = scan(tile)
+      break if num_images != 0
+      i == 3 ? tile.flip! : tile.rotate!
       tile.refresh!
-      scan(tile)
     end
+    num_images
   end
 
-  # check for occurances of image in the tiles current orientation
+  # scans through the tile looking for images
+  # images are matched one character at a time.
+  # an attempted match is abandoned upon the first failed comparison
   def scan(tile)
     num_images = 0
     for x in 0..(tile.data.length - @max_x-1) do
       for y in 0..(tile.data.length - @max_y-1) do
-        num_images+=1 if img_coords.map{|x1,y1| tile.data[x+x1][y+y1] == @char }.all?
+        match = img_coords.map do |x1,y1|
+          break [false] if tile.data[x+x1][y+y1] != @char
+          true
+        end
+        num_images+=1 if match.all?
       end
     end
     num_images
