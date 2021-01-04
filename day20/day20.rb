@@ -1,37 +1,23 @@
-require "./tile.rb"
-require "./board.rb"
+require './tile.rb'
+require './puzzle.rb'
+require './image_scanner.rb'
 
-tiles = []
-File.read("input.txt").split("\n\n").each do |tile|
-  tile_info = tile.split("\n")
-  tile_id   = tile_info.first.delete("^0-9")
-  tile_data = tile_info[1..-1]
-  tiles << Tile.new(:id=>tile_id,:data=>tile_data)
+tiles = File.read("input_lg.txt").split("\n\n").map do |data|
+  tile = data.split("\n")
+  Tile.new(:id=>tile.first.delete("^0-9"),:data=>tile[1..-1])
 end
 
-board = Board.new(tiles)
+puzzle = Puzzle.new(:tiles=>tiles)
+puzzle.solve
 
 # Part 1
-puts "Part 1 answer: #{board.corners.map{|c| c.id.to_i }.reduce(:*)}"
+puts "Part 1: #{puzzle.corners.map{|tile| tile.id.to_i }.reduce(:*)}"
 
-# Part 2 Shenanigans
-# solve the puzzle
-board.solve
-# remove borders of each tile
-board.strip!
-# create a new tile out of the combined Tiles
-theAnswer = Tile.new(:id => "The Answer", :data=> board.combine)
+# Part 2
 monster = ["..................#.",
            "#....##....##....###",
            ".#..#..#..#..#..#..."]
-
-num_monsters = theAnswer.scan(monster)
-1.upto(9) do |i|
-  break if num_monsters > 0
-  theAnswer.rotate!
-  theAnswer.flip! if i % 4 == 0
-  num_monsters = theAnswer.scan(monster)
-end
-
-puts "There are #{num_monsters} monsters"
-puts "Water roughness is #{theAnswer.count("#") - num_monsters*15}"
+board = puzzle.as_tile
+scanner = ImageScanner.new(:image=>monster)
+num_monsters = scanner.num_images(board).max
+puts "Part 2: #{num_monsters} monsters, #{board.count("#") - num_monsters*15} roughness"
