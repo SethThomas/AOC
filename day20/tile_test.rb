@@ -47,28 +47,6 @@ RSpec.describe Tile do
     end
   end
 
-  describe "#refresh!", :focus=> true do
-    # start=>rotate=>rotate=>flip
-    # 12    41     54    45
-    # 45 => 52  => 21 => 12
-    it "applies flips/rotations to the underlying tile data" do
-      @tile.rotate! ; @tile.rotate! ; @tile.flip!
-      expect { @tile.refresh! }.to change {@tile.data}.
-      from([["1", "2"], ["4", "5"]]).to([["4", "5"], ["1", "2"]])
-    end
-    # 12    21     52    45
-    # 45 => 54  => 41 => 12
-    it "order of flip/rotations doesn't matter" do
-      @tile.flip!; @tile.rotate! ; @tile.rotate!;
-      expect { @tile.refresh! }.to change {@tile.data}.
-      from([["1", "2"], ["4", "5"]]).to([["4", "5"], ["1", "2"]])
-    end
-    it "maintains the same orientation between calls" do
-      @tile.flip!; @tile.rotate! ; @tile.rotate!;
-      expect { @tile.refresh! }.to_not change{@tile.to_s}
-    end
-  end
-
   describe "#to_s" do
     it "returns a formatted string with heading" do
       result = ["12","45"].join("\n")
@@ -150,7 +128,7 @@ RSpec.describe Tile do
               "****"]
       @tile = Tile.new(:id=>1,:data=> data )
     end
-    it "returns a borderless tile" do
+    it "returns a borderless tile", :focus=>true do
       expect(@tile.remove_borders).to eql(["..",".."])
     end
   end

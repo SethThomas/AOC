@@ -26,7 +26,6 @@ class ImageScanner
       num_images = scan(tile)
       break if num_images != 0
       i == 3 ? tile.flip! : tile.rotate!
-      tile.refresh!
     end
     num_images
   end
@@ -36,10 +35,11 @@ class ImageScanner
   # an attempted match is abandoned upon the first failed comparison
   def scan(tile)
     num_images = 0
-    for x in 0..(tile.data.length - @max_x-1) do
-      for y in 0..(tile.data.length - @max_y-1) do
+    data = tile.data
+    for x in 0..(data.length - @max_x-1) do
+      for y in 0..(data.length - @max_y-1) do
         match = img_coords.map do |x1,y1|
-          break [false] if tile.data[x+x1][y+y1] != @char
+          break [false] if data[x+x1][y+y1] != @char
           true
         end
         num_images+=1 if match.all?

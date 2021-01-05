@@ -14,10 +14,10 @@ puts "Part 1: #{puzzle.corners.map{|tile| tile.id.to_i }.reduce(:*)}"
 # Part 2
 puzzle.solve
 board = puzzle.as_tile
-
 monster = ["..................#.",
            "#....##....##....###",
            ".#..#..#..#..#..#..."]
+
 scanner = ImageScanner.new(:image=>monster)
 num_monsters = scanner.num_images(board)
 puts "Part 2: #{num_monsters} monsters, #{board.count("#") - num_monsters*15} roughness"
