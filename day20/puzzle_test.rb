@@ -32,7 +32,7 @@ RSpec.describe Puzzle do
 
   describe "#solve" do
     it "solves the puzzle" do
-      @puzzle.solve
+      @puzzle.solve!
       board_ids = @puzzle.board.map{|row| row.map{|tile| tile.id }}
       expect(board_ids).to eql([["1951", "2311", "3079"],
                                 ["2729", "1427", "2473"],

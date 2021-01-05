@@ -4,45 +4,52 @@ class Tile
 
   attr_reader :id, :data_cache
 
-  NUM_EDGES = 4
+  NUM_SIDES = 4
   SIDES = {:N=>0,:E=>1,:S=>2,:W=>3}
   EDGE_LABELS =  %i(a b c d e f g h)
-  EDGE_STATES = [%i(a b c d e d g b),
-                 %i(h a f c d c b a),
-                 %i(g h e f c f a h),
-                 %i(b g d e f e h g)]
+  EDGE_STATES = [%i(a b c d e d g b), # 0°
+                 %i(h a f c d c b a), # 90°
+                 %i(g h e f c f a h), # 180°
+                 %i(b g d e f e h g)] # 270°
 
   def initialize(args)
     @id = args[:id]
     @data = args[:data].freeze
-    @edge_hash = EDGE_LABELS.zip(all_edges).to_h
     @flipped,@num_rotations = false,0
-    @data_cache = {[@flipped,@num_rotations] => @data.dup }
+    @data_cache = Hash.new {|h,k| h[k] = refresh }
   end
 
   # returns Set of all possible edge orientations
   def all_edges
     @all_edges ||= begin
-      edges = [ @data.first,@data.map{ |r| r[-1]  }.join,
-                @data.last, @data.map{ |r| r[0] }.join]
+      # N E S W edges
+      edges = [ @data.first,@data.map{ |r| r[-1]}.join,
+                @data.last ,@data.map{ |r| r[0] }.join]
       Set.new(edges+edges.map{|e|e.reverse})
     end
   end
 
-  # rotate edges 90 degrees clockwise
+  # rotate tile 90 degrees clockwise
   def rotate!
-    @num_rotations = (@num_rotations+1) % NUM_EDGES
+    @num_rotations = (@num_rotations+1) % NUM_SIDES
   end
 
-  # flip edges on the Y axis
+  # flip tile on the Y axis
   def flip!
     @flipped = !@flipped
   end
 
+  # returns the edge for the given label
+  # e.g. :a maps to the North edge, :b maps to the East edge, etc
+  def edge_for(label)
+    @edge_hash ||= EDGE_LABELS.zip(all_edges).to_h
+    @edge_hash[label]
+  end
+
   # returns the edge at the specified direction (N S E W)
-  def edge_at(dir)
-    flip_offset = @flipped ? SIDES[dir] + NUM_EDGES : SIDES[dir]
-    @edge_hash[EDGE_STATES[@num_rotations][flip_offset]]
+  def edge_at(direction)
+    edge_index = @flipped ? SIDES[direction] + NUM_SIDES : SIDES[direction]
+    edge_for(EDGE_STATES[@num_rotations][edge_index])
   end
 
   # returns true of self is a neighbor of tile, false otherwise
@@ -65,17 +72,13 @@ class Tile
     return false unless has_edge?(edge)
     8.times do |i|
       return true if edge_at(dir) == edge
-      i == NUM_EDGES-1 ? flip! : rotate!
+      i == NUM_SIDES-1 ? flip! : rotate!
     end
   end
 
   # return a copy of tile data with borders removed
   def remove_borders
-    d = data
-    # remove the first and last rows
-    d.shift ; d.pop
-    # remove the first and last characters of each row
-    d.each{|row| row.slice!(0); row.slice!(-1) }
+    data.dup[1..-2].map{|row| row.slice!(1..-2) }
   end
 
   # return frequency of char in tile data
@@ -83,13 +86,17 @@ class Tile
     @count ||= @data.map{|row| row.count(char) }.reduce(:+)
   end
 
+  # returns copy of tile data based on current number of rotations and flip status
+  def refresh
+    d = @data.dup.map{ |row| row.split("") }
+    @num_rotations.times { d = d.transpose.map(&:reverse) }
+    d.map{|d1| d1.reverse! } if @flipped
+    d.map{|d1| d1.join}
+  end
+
+  # return the current orientation of the tile
   def data
-    @data_cache[[@flipped,@num_rotations]] ||= begin
-      d = @data.dup.map{ |a| a.split("") }
-      @num_rotations.times { d = d.transpose.map(&:reverse) }
-      d.map{|d1| d1.reverse! } if @flipped
-      d.map{|d1| d1.join}
-    end
+    @data_cache[[@flipped,@num_rotations]]
   end
 
   def to_s

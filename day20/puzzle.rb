@@ -10,7 +10,7 @@ class Puzzle
     @board = Array.new(@dimension){Array.new(@dimension)}
   end
 
-  def solve
+  def solve!
     # Step 1: pick any corner
     corner = corners.first
     # Step 2: rotate corner into position
@@ -71,6 +71,13 @@ class Puzzle
       row_of_tiles.map{ |tile| tile.remove_borders }
     end.map{|d| d.transpose }.flatten(1).map{|d| d.join}
     Tile.new(:id=>1234,:data=>data)
+  end
+
+  # solves the puzzle, strips borders in tiles and
+  # returns a single tile representing the combined image
+  def solution
+    solve!
+    as_tile
   end
 
   # print 2D board of tile ID's
