@@ -1,7 +1,6 @@
 require './tile.rb'
 require './puzzle.rb'
 require './tile_scanner.rb'
-require 'benchmark'
 
 tiles = File.read("input_lg.txt").split("\n\n").map do |data|
   tile = data.split("\n")
@@ -19,4 +18,5 @@ monster = ["..................#.",
            ".#..#..#..#..#..#..."]
 scanner = TileScanner.new(:tile=>combined_image)
 num_monsters = scanner.num_images(monster)
-puts "Part 2: #{num_monsters} monsters, #{combined_image.count("#") - num_monsters*15} roughness"
+monster_size = monster.map{|row| row.count("#")}.sum
+puts "Part 2: #{num_monsters} monsters, #{combined_image.count("#") - num_monsters*monster_size} roughness"
