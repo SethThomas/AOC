@@ -23,8 +23,8 @@ class Tile
   def all_edges
     @all_edges ||= begin
       # N E S W edges
-      edges = [ @data.first,@data.map{ |r| r[-1]}.join,
-                @data.last ,@data.map{ |r| r[0] }.join]
+      edges = [ @data.first,@data.map{|r|r[-1]}.join,
+                @data.last ,@data.map{|r|r[0]}.join]
       Set.new(edges+edges.map{|e|e.reverse})
     end
   end
@@ -86,12 +86,12 @@ class Tile
     @count ||= @data.map{|row| row.count(char) }.reduce(:+)
   end
 
-  # returns copy of tile data based on current number of rotations and flip status
+  # returns copy of tile data based on flip status and current number of rotations
   def refresh
     d = @data.dup.map{ |row| row.split("") }
     @num_rotations.times { d = d.transpose.map(&:reverse) }
-    d.map{|d1| d1.reverse! } if @flipped
-    d.map{|d1| d1.join}
+    d.map(&:reverse!) if @flipped
+    d.map(&:join)
   end
 
   # return the current orientation of the tile
