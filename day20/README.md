@@ -21,7 +21,6 @@ Finished in 0.01434 seconds (files took 0.14668 seconds to load)
 23 examples, 0 failures
 ```
 
-## Original Problem (from [AoC](https://adventofcode.com/2020/day/20))
 ## \-\-- Day 20: Jurassic Jigsaw \-\--
 
 The high-speed train leaves the forest and quickly carries you south.
