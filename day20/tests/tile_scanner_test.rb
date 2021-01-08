@@ -1,23 +1,24 @@
-require './tile_scanner.rb'
-require './tile.rb'
+require '../tile_scanner.rb'
+require '../tile.rb'
 
 RSpec.describe TileScanner do
   before do
-    @image = ["##",
-             ".#"]
+    image_data = ["##",
+                  ".#"]
     tile_data = ["......",
                  ".##...",
                  "..#...",
                  "..#....",
                  "......",
                  "##...#"]
-    @tile = Tile.new(:id=>1,:data=> tile_data )
-    @scaner = TileScanner.new(:tile=>@tile)
+    @tile = Tile.new(id: 1,data: tile_data )
+    @image = Tile.new(id: 2,data: image_data )
+    @scaner = TileScanner.new(tile: @tile, char: "#")
   end
 
-  describe "#img_coords" do
+  describe "#img_coordinates" do
     it "returns (x,y) coordinates for an image" do
-      expect(@scaner.img_coords(@image)).to eql([[0,0],[0,1],[1,1]])
+      expect(@scaner.coordinates(@image.data)).to eql([[0,0],[0,1],[1,1]])
     end
   end
 

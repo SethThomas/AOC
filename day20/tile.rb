@@ -2,30 +2,28 @@ require 'set'
 
 class Tile
 
-  attr_reader :id, :data_cache
+  attr_reader :id, :length, :width
 
   NUM_SIDES = 4
   SIDES = {:N=>0,:E=>1,:S=>2,:W=>3}
-  EDGE_LABELS =  %i(a b c d e f g h)
-  EDGE_STATES = [%i(a b c d e d g b), # 0°
-                 %i(h a f c d c b a), # 90°
-                 %i(g h e f c f a h), # 180°
-                 %i(b g d e f e h g)] # 270°
+  EDGE_LABELS =  %i[a b c d e f g h]
+  EDGE_STATES = [%i[a b c d e d g b], # 0°
+                 %i[h a f c d c b a], # 90°
+                 %i[g h e f c f a h], # 180°
+                 %i[b g d e f e h g]] # 270°
 
-  def initialize(args)
-    @id = args[:id]
-    @data = args[:data].freeze
+  def initialize(id:,data:)
+    @id = id
+    @data = data.freeze
     @flipped,@num_rotations = false,0
-    @data_cache = Hash.new {|h,k| h[k] = refresh }
   end
 
-  # returns Set of all possible edge orientations
   def all_edges
     @all_edges ||= begin
       # N E S W edges
       edges = [ @data.first,@data.map{|r|r[-1]}.join,
-                @data.last ,@data.map{|r|r[0]}.join]
-      Set.new(edges+edges.map{|e|e.reverse})
+                @data.last ,@data.map{|r|r[0]}.join ]
+      Set.new(edges+edges.map(&:reverse))
     end
   end
 
@@ -76,14 +74,20 @@ class Tile
     end
   end
 
-  # return a copy of tile data with borders removed
   def remove_borders
     data.dup[1..-2].map{|row| row.slice!(1..-2) }
   end
 
-  # return frequency of char in tile data
   def count(char)
-    @count ||= @data.map{|row| row.count(char) }.reduce(:+)
+    @data.map{|row| row.count(char) }.reduce(:+)
+  end
+
+  def length
+    data.first.length
+  end
+
+  def width
+    data.length
   end
 
   # returns copy of tile data based on flip status and current number of rotations
@@ -94,12 +98,13 @@ class Tile
     d.map(&:join)
   end
 
-  # return the current orientation of the tile
   def data
+    @data_cache ||= Hash.new {|h,k| h[k] = refresh }
     @data_cache[[@flipped,@num_rotations]]
   end
 
   def to_s
     data.join("\n")
   end
+
 end

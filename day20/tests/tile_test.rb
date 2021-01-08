@@ -1,4 +1,4 @@
-require './tile.rb'
+require '../tile.rb'
 
 RSpec.describe Tile do
   before do
