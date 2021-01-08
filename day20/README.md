@@ -1,4 +1,4 @@
-###Advent of Code - Day 20
+Advent of Code - Day 20
 
 My solution to [Advent of Code - Day 20](https://adventofcode.com/2020/day/20)
 
