@@ -23,7 +23,7 @@ Finished in 0.01434 seconds (files took 0.14668 seconds to load)
 
 ## Original Problem (from [AoC](https://adventofcode.com/2020/day/20))
 
-
+```
 --- Day 20: Jurassic Jigsaw ---
 The high-speed train leaves the forest and quickly carries you south. You can even see a desert in the distance! Since you have some spare time, you might as well see if there was anything interesting in the image the Mythical Information Bureau satellite captured.
 
@@ -280,3 +280,4 @@ When looking for this pattern in the image, the spaces can be anything; only the
 Determine how rough the waters are in the sea monsters' habitat by counting the number of # that are not part of a sea monster. In the above example, the habitat's water roughness is 273.
 
 How many # are not part of a sea monster?
+```
